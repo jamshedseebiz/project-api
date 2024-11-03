@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        .container {
+            width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin-top: 120px;
+        }
+        .container h2 {
+            text-align: center;
+        }
+        .container label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .container input, .container textarea {
+            width: 100%;
+            padding: 6px;
+            margin: 5px 0;
+            border: 1px solid #232222;
+            border-radius: 4px;
+        }
+        .container button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .container button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        #back{
+  width: 10%;
+    padding: 5px;
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+    
+    <button onclick="openNewPage()" id="back">Back</button>
+<div class="container">
+    <h2>New post</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" rows="4" required></textarea>
+
+        <label for="photo">Photo:</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required>
+
+        <button type="submit" >Creat Post</button>
+    </form>
+    <p id="responseMessage"></p>
+
+</div>
+
+<script>
+    
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const token = localStorage.getItem('token');
+
+    // Check if token exists
+    if (!token) {
+        alert('User not logged in');
+        return; // Stop execution if token is missing
+    }
+
+    const fileInput = document.getElementById('photo');
+    const file = fileInput.files[0];
+    const formData = new FormData(); 
+
+    if (file) {
+        formData.append('photo', file);
+    }
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    formData.append('title', title);
+    formData.append('content', content);
+
+    // Add authentication header if needed
+    fetch('http://localhost:3001/posts', { 
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`, 
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+    
+        console.log('Success:', data);
+        
+        document.getElementById('message').innerText = 'Post sent successfully!';
+        
+        alert('Post sent successfully!');
+        
+       
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        document.getElementById('message').innerText = 'Post sending failed! Please try again.';
+        alert('Post sending failed! Please try again.');
+    });
+    this.reset();
+});
+
+ 
+ 
+
+function openNewPage() {
+            window.location.replace('profile.html'); 
+        }
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            color: #000;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button.login {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            margin-top: 10px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button.login:hover {
+            background-color: #218838;
+        }
+        #back{
+  width: 10%;
+    padding: 5px;
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+    
+    <button onclick="openNewPage()" id="back">Back</button>
+    <div class="container">
+        <form id="updateForm">
+            <h2>Update Information</h2>
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" required readonly>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit"   class="login">Update</button>
+        </form>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+const token = localStorage.getItem('token');
+var decoded = jwt_decode(token);
+console.log(decoded)
+async function getUserData() {
+    const url = `http://localhost:3001/user/${decoded.id}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            }
+        });
+
+        if (response.ok) {  
+            const data = await response.json();
+            console.log(data);
+             
+            document.getElementById('name').value = data.user.name;
+            document.getElementById('email').value = data.user.email;
+            document.getElementById('phone').value = data.user.phone;
+            document.getElementById('password').value = data.user.password;
+        } else {
+            
+            const errorData = await response.json();  
+            console.error('Error:', errorData.message || 'Error fetching user data');
+            alert(`Error fetching user data: ${errorData.message || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('An error occurred while fetching user data');
+    }
+}
+
+getUserData();
+
+//  update function  
+document.getElementById('updateForm').addEventListener('submit', async (event) => {
+    event.preventDefault(); 
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+
+    console.log(name, email, phone, password);
+
+    const url = `http://localhost:3001/updateuser/${decoded.id}`;
+    
+    const updatedRecord = {
+        name,
+        email,
+        phone,
+        password
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Include the token if required
+            },
+            body: JSON.stringify(updatedRecord)
+        });
+
+        const result = await response.json();
+        console.log('Response:', response); // Log the response object
+        console.log('Result:', result); // Log the response data
+
+        if (response.ok) { // Use response.ok for better readability
+            alert('User information updated successfully');
+            // Optional: Reset the form or redirect after successful update
+            // document.getElementById('updateForm').reset();
+            // window.location.replace("menu.html");
+        } else {
+            // Log the error details if the response is not ok
+            console.error('Error:', result.message || 'Failed to update user information');
+            alert('Error updating user information: ' + (result.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('An error occurred while updating information');
+    }
+});
+
+
+   
+
+function openNewPage() {
+            window.location.replace('menu.html'); // replace with your desired URL
+        }   
+
+
+
+</script>
+
+
+
+
+
+</html>

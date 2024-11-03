@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts Feed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .post-container {
+            width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .post {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .post .user-name {
+            font-weight: bold;
+        }
+        .post .content {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .actions button {
+            border: none;
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .card-image{
+            width: 80%;
+            margin-left: 50px;
+        }
+        .comment-section {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+#delete{
+    background-color: red;
+}
+/* Like button styling */
+.comment-section button {
+    background-color: #18145d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.comment-section button:hover {
+    background-color: #123ab2;
+}
+
+/* Comment input field */
+.comment-section input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* Submit button styling */
+.comment-section button:last-child {
+    background-color: #007bff;
+}
+
+.comment-section button:last-child:hover {
+    background-color: #0056b3;
+}
+
+/* Like count */
+#likeCount {
+    margin-left: 8px;
+    font-weight: bold;
+    color: #333;
+}
+#back{
+  width: 10%;
+    padding: 5px;
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+    
+    <button onclick="openNewPage()" id="back">Back</button>
+<div class="post-container" id="postContainer">
+    <!-- Posts will be injected here -->
+</div>
+
+<script>
+    async function fetchPosts() {
+        try {
+            const response = await fetch('http://localhost:3001/posts', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // assuming token is stored in localStorage
+                }
+            });
+            console.log(response)
+
+            if (response.ok) {
+                const posts = await response.json();
+                displayPosts(posts);
+            } else {
+                console.error('Failed to fetch posts');
+            }
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+        }
+    }
+
+    function displayPosts(posts) {
+        const postContainer = document.getElementById('postContainer');
+        postContainer.innerHTML = '';  
+
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+
+            postElement.innerHTML = `
+              <div class="actions">
+                    <button onclick="editPost('${post._id}')">Edit</button>
+                    <button onclick="deletePost('${post._id}')" id="delete">Delete</button>
+                </div>
+             <p><strong>Posted by:</strong> ${post.userId.name}</p>
+                 <h2>${post.title}</h2>
+                    <p>${post.content}</p>
+                  <img src="${post.photo}" alt="Image" class="card-image">
+                <!-- Like button -->
+           
+
+            <!-- Comment section -->
+            <div class="comment-section">
+                 <button onclick="likePost('${post._id}')">Like</button> <span id="likeCount-${post._id}">${post.likes || 0}</span>
+                <input type="text" id="commentInput-${post._id}" placeholder="Write a comment..." />
+                <button onclick="submitComment('${post._id}')">Submit</button>
+                <div id="commentsContainer-${post._id}">
+                    <!-- Comments will be displayed here -->
+                </div>
+            </div>
+                 
+            `;
+
+            postContainer.appendChild(postElement);
+        });
+    }
+    function editPost(postId) {
+        
+        console.log("Edit post with ID:", postId);
+        window.location.replace(`updatepost.html?postId=${postId}`)
+    }
+    async function deletePost(postId) {
+    const token = localStorage.getItem('token');
+    const confirmDelete = confirm("Are you sure you want to delete your Post?");
+   if(confirmDelete){
+    try {
+        const response = await fetch(`http://localhost:3001/deleteposts/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // include "Bearer" prefix if required
+            }
+        });
+
+        if (response.ok) {
+            alert("Post deleted");
+            location.reload(); 
+        }  
+        else {
+            alert("Failed to delete the post");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong");
+    }
+   }
+}
+
+function openNewPage() {
+            window.location.replace('menu.html'); // replace with your desired URL
+        }
+
+    // Fetch posts on page load
+    window.onload = fetchPosts;
+</script>
+
+</body>
+</html>

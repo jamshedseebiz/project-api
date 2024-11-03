@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post</title>
+    <style>
+        .container {
+            width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin-top: 120px;
+        }
+        .container h2 {
+            text-align: center;
+        }
+        .container label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .container input, .container textarea {
+            width: 100%;
+            padding: 6px;
+            margin: 5px 0;
+            border: 1px solid #232222;
+            border-radius: 4px;
+        }
+        .container button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .container button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .current-photo {
+            display: block;
+            margin-top: 10px;
+            width: 30%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        #back{
+  width: 10%;
+    padding: 5px;
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+    
+    <button onclick="openNewPage()" id="back">Back</button>
+<div class="container">
+    <h2>Edit Post</h2>
+    <form id="editForm" enctype="multipart/form-data">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" rows="4" required></textarea>
+
+        <label for="photo">Current Photo:</label>
+        <img id="Photo" src="" alt="photo" class="current-photo">
+
+        <label for="photo">Upload New Photo:</label>
+        <input type="file" id="photo" name="photo" accept="image/*">
+
+        <button type="submit">Update Post</button>
+    </form>
+    <p id="responseMessage"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+    const token = localStorage.getItem('token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('postId');
+    const url = `http://localhost:3001/getupdatepost/${postId}`;
+
+    async function fetchPostData() {
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const post = await response.json();
+
+            document.getElementById('title').value = post.title;
+            document.getElementById('content').value = post.content;
+            document.getElementById('Photo').src = post.photo;
+        } catch (error) {
+            console.error('Error fetching post data:', error);
+        }
+    }
+  
+    async function updatePost(event) {
+        event.preventDefault();  
+
+        const formData = new FormData(document.getElementById('editForm'));
+ 
+        
+        try {
+            const response = await fetch(`http://localhost:3001/updatepost/${postId}`, {
+                method: 'PUT',  
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                const updatedPost = await response.json();
+             
+                document.getElementById('responseMessage').textContent = 'Post updated successfully!';
+                window.location.replace('profile.html')
+            } else {
+                const errorData = await response.json();
+                document.getElementById('responseMessage').textContent = `Error updating post: ${errorData.message}`;
+            }
+        } catch (error) {
+            console.error('Error updating post:', error);
+            document.getElementById('responseMessage').textContent = 'Error updating post. Please try again.';
+        }
+    }
+
+    document.getElementById('editForm').addEventListener('submit', updatePost,
+        
+    );
+
+    fetchPostData();
+
+
+function openNewPage() {
+            window.location.replace('profile.html'); // replace with your desired URL
+        }   
+    
+</script>
+</body>
+</html>

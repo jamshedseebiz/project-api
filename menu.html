@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Menu</title>
+    <style>
+        body {
+        background-color: black; /* Set the page background color to black */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* height: 100vh; */
+        margin: 0;
+    }
+        /* Menu Container */
+        .menu {
+            background-color: black;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Menu Items */
+        .menu button {
+            float: left;
+            display: block;
+            color:black;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        /* Hover Effect */
+        .menu button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu">
+        <button type="submit" id="register">Register</button>
+        <button type="submit" id="login">login</button>
+        <button type="submit" id="creatpost">creatpost</button>
+        <button type="submit" id="Timeline">Timeline</button>
+        <button type="submit" id="Profile">Profile</button>
+        <button type="submit" id="logout">logout</button>
+        <button type="submit" id="delete">Delete Account</button>
+        <button type="submit" id="setting">Account Setting</button>
+        
+
+            
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script>
+        document.getElementById("register").addEventListener("click", function() {
+            window.location.replace("index.html");  
+        });
+        document.getElementById("creatpost").addEventListener("click", function() {
+           if(token){
+            window.location.replace("post.html");  
+           }
+        });
+        document.getElementById("login").addEventListener("click", function() {
+
+            window.location.replace("login.html")
+        });
+    
+        document.getElementById("setting").addEventListener("click", function() {
+            if(token){
+                window.location.replace('setting.html')
+       
+                 
+               
+             
+            }else{
+                alert("login first");
+            }
+            
+            
+           
+        });
+        document.getElementById("Timeline").addEventListener("click", function() {
+            
+                window.location.replace('timeline.html')
+           
+            
+            
+           
+        });
+        document.getElementById("Profile").addEventListener("click", function() {
+            
+            window.location.replace('profile.html')
+       
+        
+        
+       
+    });
+
+        document.getElementById("logout").addEventListener("click", function() {
+            alert("Your account has been  logout successfully.");
+            localStorage.removeItem('token');
+           window.location.replace('menu.html')
+        });
+
+
+
+
+        const token=localStorage.getItem('token');
+var decoded = jwt_decode(token);
+        const userId = decoded.id;  
+        console.log(userId)
+
+document.getElementById('delete').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    const confirmDelete = confirm("Are you sure you want to delete your account?");
+    if (confirmDelete) {
+        fetch(`http://localhost:3001/deleteuser/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })  
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Your account has been deleted successfully.");
+                
+            } else {
+                alert("There was an error deleting your account. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again later.");
+        });
+    }
+
+
+    localStorage.removeItem('token')
+});
+
+
+
+        
+    </script>
+
+</body>
+</html>

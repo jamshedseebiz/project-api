@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts from Other Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        #postsContainer {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 80px;
+            margin-right: 20px;
+        }
+        .post {
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+        }
+        h2 {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .card-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .post strong {
+            font-weight: 600;
+            color: #000;
+        }
+        .comment-section button {
+    background-color: #18145d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.comment-section button:hover {
+    background-color: #123ab2;
+}
+
+/* Comment input field */
+.comment-section input[type="text"] {
+    flex: 1;
+    padding: 8px;
+ 
+
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* Submit button styling */
+.comment-section button:last-child {
+    background-color: #007bff;
+}
+
+.comment-section button:last-child:hover {
+    background-color: #0056b3;
+}
+
+/* Like count */
+#likeCount {
+    margin-left: 8px;
+    font-weight: bold;
+    color: #333;
+}
+#back{
+  width: 80%;
+    padding: 5px;
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+
+
+
+    <h1><button onclick="openNewPage()" id="back">Back</button>
+        Posts   Other Users
+        
+    </h1>
+    
+    <div id="postsContainer"></div>
+    
+
+    <script>
+        async function fetchPosts() {
+            const token = localStorage.getItem('token'); // Assuming you store your token in localStorage
+            const response = await fetch('http://localhost:3001/getpost', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                console.error('Error:', errorResponse.message);
+                alert('Could not fetch posts: ' + errorResponse.message);
+                return;
+            }
+
+            const data = await response.json();
+            displayPosts(data.posts);
+        }
+
+        function displayPosts(posts) {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = ''; // Clear any previous posts
+
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.classList.add('post');
+                postDiv.innerHTML = `
+                 <p><strong>Posted by:</strong> ${post.userId.name}</p> 
+                    <h2>${post.title}</h2>
+                    <p>${post.content}</p>
+                  <img src="${post.photo}" alt="Image" class="card-image">
+<div class="comment-section">
+                 <button onclick="likePost('${post._id}')">Like</button> <span id="likeCount-${post._id}">${post.likes || 0}</span>
+                <input type="text" id="commentInput-${post._id}" placeholder="Write a comment..." />
+                <button onclick="submitComment('${post._id}')">Submit</button>
+                <div id="commentsContainer-${post._id}">
+                    <!-- Comments will be displayed here -->
+                </div>
+            </div>
+                   
+                `;
+                postsContainer.appendChild(postDiv);
+            });
+        }
+
+
+        function openNewPage() {
+            window.location.replace('menu.html'); // replace with your desired URL
+        }
+
+        // Call fetchPosts when the page loads
+        window.onload = fetchPosts;
+    </script>
+</body>
+</html>

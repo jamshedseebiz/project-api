@@ -1,0 +1,234 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Login Form</title>
+    <style>body {
+        background-color: black; /* Set the page background color to black */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    
+    .login-container {
+        background-color: rgba(255, 255, 255, 0.8); /* Transparent background for the form */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .login-form {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .login-form h2 {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .login-form input {
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    
+    .login-form button {
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff; /* Change button color */
+        color: white;
+        cursor: pointer;
+    }
+    
+    .login-form button:hover {
+        background-color: #0056b3; /* Darker button color on hover */
+    }
+    #back{
+  width: 10%;
+    padding: 5px;
+    background-color: #0056b3;
+    position: relative;
+ bottom: 450px;
+ right: 700px;
+}
+    </style>
+</head>
+
+<body>
+    <button onclick="openNewPage()" id="back">Back</button>
+    <div class="login-container">
+        <form id="login-form" class="login-form">
+            <h2>Login</h2>
+            <input type="email" id="email" placeholder="email"  required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="login">Login</button>
+        </form>
+    </div>
+    
+</body>
+<script>
+    const signin = document.getElementById('login-form');
+    signin.addEventListener('submit', (e) => {
+        //  console.log("ok")
+        
+            e.preventDefault();  
+const email=document.getElementById('email').value;
+const password=document.getElementById('password').value;
+ 
+const data={
+    email:email,
+    password:password
+}
+const url="http://localhost:3001/login";
+fetch(url,{
+method:"Post",
+headers:{
+    "Content-Type":"application/json"
+},
+body:JSON.stringify(data)
+})
+.then(response => response.json())
+    .then(result => {
+        if (result && result.token) {
+            alert("Login successful!");
+            localStorage.setItem('token', result.token);
+            window.location.replace("timeline.html");
+        } else {
+            alert("Login failed: Invalid credentials.");
+        }
+    })
+    .catch(error => {
+        alert("Login failed: " , error); 
+        // console.log("error", error);
+    });
+});
+       
+function openNewPage() {
+            window.location.replace('menu.html'); // replace with your desired URL
+        }
+</script>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <style>
+        body {
+            background-color: black; /* Set the page background color to black */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: rgba(0, 255, 0, 0.8); /* Set the form background to green with transparency */
+            padding: 40px; /* Increased padding for a larger form */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            width: 400px; /* Set a specific width for the form */
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-form h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-form input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .login-form button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: black; /* Change button color to black */
+            color: white;
+            cursor: pointer;
+            font-size: 16px; /* Increased font size */
+        }
+
+        .login-form button:hover {
+            background-color: #333; /* Darker button color on hover */
+        }
+
+        #back {
+            width: 10%;
+            padding: 5px;
+            background-color: #0056b3;
+            position: relative;
+            bottom: 450px;
+            right: 700px;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="openNewPage()" id="back">Back</button>
+    <div class="login-container">
+        <form id="login-form" class="login-form">
+            <h2>Login</h2>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="login">Login</button>
+        </form>
+    </div>
+    
+    <script>
+        const signin = document.getElementById('login-form');
+        signin.addEventListener('submit', (e) => {
+            e.preventDefault();  
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+ 
+            const data = {
+                email: email,
+                password: password
+            };
+            const url = "http://localhost:3001/login";
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result && result.token) {
+                    alert("Login successful!");
+                    localStorage.setItem('token', result.token);
+                    window.location.replace("timeline.html");
+                } else {
+                    alert("Login failed: Invalid credentials.");
+                }
+            })
+            .catch(error => {
+                alert("Login failed: " + error); 
+            });
+        });
+        
+        function openNewPage() {
+            window.location.replace('menu.html'); 
+        }
+    </script>
+</body>
+</html>
+
